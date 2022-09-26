@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"fmt"
+	"math"
+	"strings"
 
 	"github.com/omarahm3/turtle/pkg/sniffer"
 	"github.com/spf13/cobra"
@@ -9,8 +11,9 @@ import (
 )
 
 const (
-	apps_type      = "apps"
-	processes_type = "processes"
+	apps_type        = "apps"
+	processes_type   = "processes"
+	max_chars_length = 40
 )
 
 var (
@@ -44,12 +47,20 @@ func list(cmd *cobra.Command, args []string) {
 
 func printApp(v string) {
 	a := sniffer.ToAppLog(v)
-	fmt.Printf("%s\t%fMB\t%fMB\n", a.App, a.Sent, a.Received)
+	fmt.Printf("%s\t%fMB\t%fMB\n", trim(a.App), a.Sent, a.Received)
 }
 
 func printProcess(v string) {
 	s := sniffer.ToSniffLog(v)
-	fmt.Printf("%s\t%fMB\t%fMB\n", s.TotalPath, s.Sent, s.Received)
+	fmt.Printf("%s\t%fMB\t%fMB\n", trim(s.App), s.Sent, s.Received)
+}
+
+func trim(s string) string {
+	min := int(math.Min(float64(len(s)), max_chars_length))
+	if len(s) < max_chars_length {
+		return fmt.Sprintf("%s%s", s, strings.Repeat(" ", max_chars_length-len(s)))
+	}
+	return fmt.Sprintf("%s...", s[0:min])
 }
 
 func init() {
