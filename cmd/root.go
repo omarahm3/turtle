@@ -13,8 +13,8 @@ var (
 	db      *buntdb.DB
 	dbPath  = "./turtle.db"
 	rootCmd = &cobra.Command{
-		Use:   "backer",
-		Short: "backup a whole directory based on a set of rules",
+		Use:   "turtle",
+		Short: "Log nethogs traffic per processes and applications",
 		Run:   runner,
 	}
 )
@@ -27,7 +27,6 @@ func Init() {
 	db.CreateIndex("apps", "*:app", buntdb.IndexString)
 	db.CreateIndex("processes", "*:process", buntdb.IndexString)
 
-	// rootCmd.PersistentFlags().StringSliceVarP(&rsyncOptions, "options", "o", nil, "override rsync options")
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)

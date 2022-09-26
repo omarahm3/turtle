@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/omarahm3/turtle/pkg/sniffer"
 	"github.com/spf13/cobra"
 	"github.com/tidwall/buntdb"
 )
@@ -30,11 +31,25 @@ func list(cmd *cobra.Command, args []string) {
 		}
 
 		return tx.Ascend(cType, func(key, value string) bool {
-			fmt.Println(value)
+			if cType == apps_type {
+				printApp(value)
+				return true
+			}
+			printProcess(value)
 			return true
 		})
 	})
 	check(err)
+}
+
+func printApp(v string) {
+	a := sniffer.ToAppLog(v)
+	fmt.Printf("%s\t%fMB\t%fMB\n", a.App, a.Sent, a.Received)
+}
+
+func printProcess(v string) {
+	s := sniffer.ToSniffLog(v)
+	fmt.Printf("%s\t%fMB\t%fMB\n", s.TotalPath, s.Sent, s.Received)
 }
 
 func init() {
