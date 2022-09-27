@@ -5,13 +5,26 @@ import (
 	"fmt"
 
 	"github.com/omarahm3/turtle/pkg/sniffer"
+	"github.com/omarahm3/turtle/pkg/sniffer/processors"
 	"github.com/spf13/cobra"
 	"github.com/tidwall/buntdb"
 )
 
+var processor processors.Processor
+
 func runner(cmd *cobra.Command, args []string) {
+	if bandwhich {
+		processor = processors.New(processors.TYPE_BANDWHICH)
+	} else {
+		processor = processors.New(processors.TYPE_NETHOGS)
+	}
+
+	if !processor.CanRunCommand() {
+		check(fmt.Errorf("command %q does not exist on the system, please make sure it is installed properly", processor.GetCommand().Args[0]))
+	}
+
 	sl := make(chan sniffer.SniffLog)
-	go sniffer.Sniff(sl)
+	go sniffer.Sniff(sl, processor)
 
 	for {
 		update(<-sl)

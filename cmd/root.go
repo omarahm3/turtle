@@ -10,9 +10,11 @@ import (
 )
 
 var (
-	db      *buntdb.DB
-	dbPath  = "./turtle.db"
-	rootCmd = &cobra.Command{
+	nethogs   bool
+	bandwhich bool
+	db        *buntdb.DB
+	dbPath    = "./turtle.db"
+	rootCmd   = &cobra.Command{
 		Use:   "turtle",
 		Short: "Log nethogs traffic per processes and applications",
 		Run:   runner,
@@ -27,6 +29,8 @@ func Init() {
 	db.CreateIndex("apps", "*:app", buntdb.IndexString)
 	db.CreateIndex("processes", "*:process", buntdb.IndexString)
 
+	rootCmd.Flags().BoolVarP(&nethogs, "nethogs", "n", true, "use nethogs as a underlayer processor")
+	rootCmd.Flags().BoolVarP(&bandwhich, "bandwhich", "b", false, "use bandwhich as a underlayer processor")
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)

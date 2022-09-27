@@ -2,15 +2,18 @@ package sniffer
 
 import (
 	"bufio"
-	"crypto/md5"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
 	"os/exec"
-	"strconv"
-	"strings"
 	"sync"
+
+	"github.com/omarahm3/turtle/pkg/helpers"
+	"github.com/omarahm3/turtle/pkg/sniffer/processors"
+)
+
+var (
+	processor processors.Processor
 )
 
 const (
@@ -82,14 +85,14 @@ func ToSniffLog(s string) SniffLog {
 	return l
 }
 
-func Sniff(sl chan SniffLog) {
+func Sniff(sl chan SniffLog, p processors.Processor) {
+	processor = p
 	message := make(chan string)
-	cmd := exec.Command("nethogs", "-v", mb_collect, "-t")
 
 	var wg sync.WaitGroup
 	wg.Add(1)
 
-	go runCmd(cmd, &wg, message)
+	go runCmd(processor.GetCommand(), &wg, message)
 	go listen(message, sl)
 
 	wg.Wait()
@@ -98,59 +101,20 @@ func Sniff(sl chan SniffLog) {
 func listen(message chan string, sl chan SniffLog) {
 	for {
 		m := <-message
-		if !strings.Contains(m, process_type) {
+		if !processor.ShouldProcess(m) {
 			continue
 		}
 
-		fields := strings.Fields(m)
-
-		if len(fields) > 0 && fields[0] == unknown_type {
-			continue
+		l := processor.Analyze(m)
+		sl <- SniffLog{
+			App:           l.App,
+			AppHash:       helpers.Hashit(l.App),
+			TotalPath:     l.TotalPath,
+			TotalPathHash: helpers.Hashit(l.TotalPath),
+			Sent:          l.Sent,
+			Received:      l.Received,
 		}
-
-		// debug(fields)
-		l := analyze(fields)
-		sl <- l
 	}
-}
-
-func analyze(output []string) SniffLog {
-	app := output[0]
-	totalPath := strings.Join(output[:len(output)-2], "")
-	received := output[len(output)-1]
-	sent := output[len(output)-2]
-
-	return SniffLog{
-		App:           app,
-		AppHash:       hashit(app),
-		TotalPath:     totalPath,
-		TotalPathHash: hashit(totalPath),
-		Sent:          parseFloat(sent),
-		Received:      parseFloat(received),
-	}
-}
-
-func parseFloat(s string) float64 {
-	f, err := strconv.ParseFloat(s, 16)
-	if err != nil {
-		panic(err)
-	}
-
-	return f
-}
-
-func hashit(s string) string {
-	algorithm := md5.New()
-	algorithm.Write([]byte(s))
-	return hex.EncodeToString(algorithm.Sum(nil))
-}
-
-func debug(output []string) {
-	fmt.Println("---------------------------")
-	for i := 0; i < len(output); i++ {
-		fmt.Printf("[%d] = %q\n", i, output[i])
-	}
-	fmt.Println("---------------------------")
 }
 
 func runCmd(cmd *exec.Cmd, wg *sync.WaitGroup, message chan string) {
