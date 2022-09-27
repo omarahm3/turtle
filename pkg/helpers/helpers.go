@@ -49,3 +49,7 @@ func NormalizeString(s string) string {
 	s = strings.ToLower(s)
 	return strings.TrimSpace(s)
 }
+
+func BitToMegabyte(bits float64) float64 {
+	return bits / 8e+6
+}

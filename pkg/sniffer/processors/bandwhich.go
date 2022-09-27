@@ -16,13 +16,14 @@ func (p *bandwhichProcessor) Analyze(s string) *Log {
 	app := helpers.NormalizeString(output[0])
 	output = output[3:]
 	metrics := strings.Split(output[0], "/")
-	sent := helpers.NormalizeString(metrics[0])
-	received := helpers.NormalizeString(metrics[1])
+	sent := helpers.ParseFloat(helpers.NormalizeString(metrics[0]))
+	received := helpers.ParseFloat(helpers.NormalizeString(metrics[1]))
 
 	return &Log{
-		App:      app,
-		Received: helpers.ParseFloat(received),
-		Sent:     helpers.ParseFloat(sent),
+		App:       app,
+		TotalPath: app,
+		Received:  helpers.BitToMegabyte(received),
+		Sent:      helpers.BitToMegabyte(sent),
 	}
 }
 

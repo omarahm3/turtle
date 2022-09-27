@@ -142,7 +142,6 @@ func readStd(r io.ReadCloser, message chan string) {
 	s := bufio.NewScanner(r)
 
 	for s.Scan() {
-		// fmt.Print(s.Text())
 		message <- s.Text()
 	}
 }
