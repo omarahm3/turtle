@@ -1,4 +1,4 @@
-package processors
+package backends
 
 import (
 	"os/exec"
@@ -7,10 +7,10 @@ import (
 	"github.com/omarahm3/turtle/pkg/helpers"
 )
 
-type bandwhichProcessor struct {
+type bandwhichBackend struct {
 }
 
-func (p *bandwhichProcessor) Analyze(s string) *Log {
+func (b *bandwhichBackend) Analyze(s string) *Log {
 	output := strings.Fields(s)
 	output = output[2:]
 	app := helpers.NormalizeString(output[0])
@@ -27,17 +27,17 @@ func (p *bandwhichProcessor) Analyze(s string) *Log {
 	}
 }
 
-func (p *bandwhichProcessor) CanRunCommand() bool {
-	return helpers.CommandExists(p.GetCommand().Args[0])
+func (b *bandwhichBackend) CanRunCommand() bool {
+	return helpers.CommandExists(b.GetCommand().Args[0])
 }
 
-func (p *bandwhichProcessor) ShouldProcess(message string) bool {
+func (b *bandwhichBackend) ShouldProcess(message string) bool {
 	if !strings.Contains(message, "process:") {
 		return false
 	}
 	return true
 }
 
-func (p *bandwhichProcessor) GetCommand() *exec.Cmd {
+func (b *bandwhichBackend) GetCommand() *exec.Cmd {
 	return exec.Command("bandwhich", "-t", "-p", "--raw")
 }

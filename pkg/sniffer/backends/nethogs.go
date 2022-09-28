@@ -1,4 +1,4 @@
-package processors
+package backends
 
 import (
 	"os/exec"
@@ -13,10 +13,10 @@ const (
 	mb_collect   = "3"
 )
 
-type nethogsProcessor struct {
+type nethogsBackend struct {
 }
 
-func (p *nethogsProcessor) Analyze(s string) *Log {
+func (n *nethogsBackend) Analyze(s string) *Log {
 	output := strings.Fields(s)
 	app := helpers.NormalizeString(output[0])
 	totalPath := helpers.NormalizeString(strings.Join(output[:len(output)-2], ""))
@@ -31,11 +31,11 @@ func (p *nethogsProcessor) Analyze(s string) *Log {
 	}
 }
 
-func (p *nethogsProcessor) CanRunCommand() bool {
+func (n *nethogsBackend) CanRunCommand() bool {
 	return helpers.CommandExists("nethogs")
 }
 
-func (p *nethogsProcessor) ShouldProcess(message string) bool {
+func (n *nethogsBackend) ShouldProcess(message string) bool {
 	if !strings.Contains(message, process_type) {
 		return false
 	}
@@ -49,6 +49,6 @@ func (p *nethogsProcessor) ShouldProcess(message string) bool {
 	return true
 }
 
-func (p *nethogsProcessor) GetCommand() *exec.Cmd {
+func (n *nethogsBackend) GetCommand() *exec.Cmd {
 	return exec.Command("nethogs", "-t", "-v", "3")
 }

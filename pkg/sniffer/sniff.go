@@ -9,12 +9,10 @@ import (
 	"sync"
 
 	"github.com/omarahm3/turtle/pkg/helpers"
-	"github.com/omarahm3/turtle/pkg/sniffer/processors"
+	"github.com/omarahm3/turtle/pkg/sniffer/backends"
 )
 
-var (
-	processor processors.Processor
-)
+var backend backends.Backend
 
 const (
 	unknown_type = "unknown"
@@ -85,14 +83,14 @@ func ToSniffLog(s string) SniffLog {
 	return l
 }
 
-func Sniff(sl chan SniffLog, p processors.Processor) {
-	processor = p
+func Sniff(sl chan SniffLog, b backends.Backend) {
+	backend = b
 	message := make(chan string)
 
 	var wg sync.WaitGroup
 	wg.Add(1)
 
-	go runCmd(processor.GetCommand(), &wg, message)
+	go runCmd(backend.GetCommand(), &wg, message)
 	go listen(message, sl)
 
 	wg.Wait()
@@ -101,11 +99,11 @@ func Sniff(sl chan SniffLog, p processors.Processor) {
 func listen(message chan string, sl chan SniffLog) {
 	for {
 		m := <-message
-		if !processor.ShouldProcess(m) {
+		if !backend.ShouldProcess(m) {
 			continue
 		}
 
-		l := processor.Analyze(m)
+		l := backend.Analyze(m)
 		sl <- SniffLog{
 			App:           l.App,
 			AppHash:       helpers.Hashit(l.App),
