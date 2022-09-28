@@ -22,7 +22,7 @@ func clear(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	err := os.Remove(dbPath)
+	err := os.Remove(getDbPath())
 	check(err)
 }
 

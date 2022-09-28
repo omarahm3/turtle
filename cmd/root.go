@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/omarahm3/turtle/pkg/helpers"
 	"github.com/spf13/cobra"
@@ -13,7 +14,6 @@ var (
 	nethogs   bool
 	bandwhich bool
 	db        *buntdb.DB
-	dbPath    = "./turtle.db"
 	rootCmd   = &cobra.Command{
 		Use:   "turtle",
 		Short: "Log nethogs traffic per processes and applications",
@@ -29,7 +29,7 @@ func Init() {
 
 	_, err := helpers.SnifferExists()
 	check(err)
-	db, err = buntdb.Open(dbPath)
+	db, err = buntdb.Open(getDbPath())
 	check(err)
 	db.CreateIndex("apps", "*:app", buntdb.IndexString)
 	db.CreateIndex("processes", "*:process", buntdb.IndexString)
@@ -54,4 +54,8 @@ func check(err error) {
 func fatalPrint(s string) {
 	fmt.Println(s)
 	os.Exit(1)
+}
+
+func getDbPath() string {
+	return filepath.Join("/var/log/", ".turtle.db")
 }
