@@ -11,7 +11,7 @@ While programmes like nethogs and bandwhich are excellent for tracking network b
 If you already have go installed:
 
 ```bash
-go install github.com/omarahm3/backer@latest
+go install github.com/omarahm3/turtle@latest
 ```
 
 Or from releases page
