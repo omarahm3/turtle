@@ -50,6 +50,6 @@ func NormalizeString(s string) string {
 	return strings.TrimSpace(s)
 }
 
-func BitToMegabyte(bits float64) float64 {
-	return bits / 8e+6
+func ByteToMebibyte(b float64) float64 {
+	return b / 1.049e+6
 }

@@ -22,8 +22,8 @@ func (p *bandwhichProcessor) Analyze(s string) *Log {
 	return &Log{
 		App:       app,
 		TotalPath: app,
-		Received:  helpers.BitToMegabyte(received),
-		Sent:      helpers.BitToMegabyte(sent),
+		Received:  helpers.ByteToMebibyte(received),
+		Sent:      helpers.ByteToMebibyte(sent),
 	}
 }
 
