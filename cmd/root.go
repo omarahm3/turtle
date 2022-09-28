@@ -34,8 +34,8 @@ func Init() {
 	db.CreateIndex("apps", "*:app", buntdb.IndexString)
 	db.CreateIndex("processes", "*:process", buntdb.IndexString)
 
-	rootCmd.Flags().BoolVarP(&nethogs, "nethogs", "n", true, "use nethogs as a underlayer backend")
-	rootCmd.Flags().BoolVarP(&bandwhich, "bandwhich", "b", false, "use bandwhich as a underlayer backend")
+	rootCmd.Flags().BoolVarP(&nethogs, "nethogs", "n", false, "use nethogs as a underlayer backend")
+	rootCmd.Flags().BoolVarP(&bandwhich, "bandwhich", "b", true, "use bandwhich as a underlayer backend")
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
