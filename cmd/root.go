@@ -27,9 +27,7 @@ func Init() {
 		os.Exit(1)
 	}
 
-	_, err := helpers.SnifferExists()
-	check(err)
-	db, err = buntdb.Open(getDbPath())
+	db, err := buntdb.Open(getDbPath())
 	check(err)
 	db.CreateIndex("apps", "*:app", buntdb.IndexString)
 	db.CreateIndex("processes", "*:process", buntdb.IndexString)
