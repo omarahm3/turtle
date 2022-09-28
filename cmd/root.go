@@ -22,6 +22,11 @@ var (
 )
 
 func Init() {
+	if !helpers.IsRoot() {
+		fmt.Println("you need to run this with sudo")
+		os.Exit(1)
+	}
+
 	_, err := helpers.SnifferExists()
 	check(err)
 	db, err = buntdb.Open(dbPath)

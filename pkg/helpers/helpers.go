@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
+	"os"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -52,4 +53,8 @@ func NormalizeString(s string) string {
 
 func ByteToMebibyte(b float64) float64 {
 	return b / 1.049e+6
+}
+
+func IsRoot() bool {
+	return os.Getuid() == 0
 }
